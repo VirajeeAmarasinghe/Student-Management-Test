@@ -38,37 +38,28 @@ class StudentController extends Controller
 
     public function store(Request $request){ 
         
-        $validator = Validator::make($request->all(), [
+        $request->validate([
             'first_name'=>'required',
             'last_name'=>'required',
             'date_of_birth'=>'required|date_format:Y-m-d',
             'percentage'=>'required|numeric',
-            'profile_picture' => 'required',
-
+            'profile_picture' => 'required_if:id,null',
         ]);
-
-        if($validator->passes()){
-
+        
+        if($request->hasFile('profile_picture')){
             $imageName = time().'.'.$request->profile_picture->getClientOriginalExtension();
 
             $request->profile_picture = $imageName;
 
             $request->file('profile_picture')->move(public_path('photos'), $imageName);
 
-
-            Student::updateOrCreate(['id'=>$request->id],
-        ['first_name'=>$request->first_name,'last_name'=>$request->last_name,
-        'date_of_birth'=>$request->date_of_birth,'percentage'=>$request->percentage,'profile_picture'=>$request->profile_picture]);
-
+            Student::updateOrCreate(['id'=>$request->id],['first_name'=>$request->first_name,'last_name'=>$request->last_name,'date_of_birth'=>$request->date_of_birth,'percentage'=>$request->percentage,'profile_picture'=>$request->profile_picture]);
+        }else{
+            Student::updateOrCreate(['id'=>$request->id],['first_name'=>$request->first_name,'last_name'=>$request->last_name,'date_of_birth'=>$request->date_of_birth,'percentage'=>$request->percentage]);
+        }
 
         return response()->json(['success'=>'Student saved successfully.']);
 
-        }
-
-        return response()->json(['error'=>$validator->errors()->all()]);
-        
-
-        
     }
 
     public function edit($id){
@@ -80,8 +71,13 @@ class StudentController extends Controller
     }
 
     public function destroy($id){
-        Student::find($id)->delete();
-        return response()->json(['success'=>'Student deleted successfully.']);
+        $result=Student::find($id)->delete(); 
 
+        if($result){
+            return response()->json(['success'=>'Student deleted successfully.']);
+        }else{
+            return response()->json(['message'=> "Error Occurred.Try Again!"], 404);  
+        }
+                 
     }
 }

@@ -28,6 +28,13 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.5.0/js/bootstrap-datepicker.js"></script>
 
+    <style>
+        table.dataTable tbody th,table.dataTable tbody td 
+{
+     white-space: nowrap;
+} 
+    </style>
+
 </head>
 
 <body>
@@ -37,45 +44,50 @@
 <div class="container">
 
     <h1>Student Management</h1>
-
-    <a class="btn btn-success" href="javascript:void(0)" id="createNewStudent"> Create New Student</a>
-
-    <div class="form-check">
-        <input class="form-check-input" type="checkbox" value="" id="filter-by-date-of-birth">
-        <label class="form-check-label" for="filter-by-date-of-birth">
-          Filter of Date-of-Birth
-        </label>
-      </div>
-      <div class="form-check">
-        <input class="form-check-input" type="checkbox" value="" id="filter-by-percentage">
-        <label class="form-check-label" for="filter-by-percentage">
-          Filter by Percentage
-        </label>
-      </div>
-    <table class="table table-bordered data-table" id="data-table">
-
-        <thead>
-
-            <tr>
-
-                <th>ID</th>
-                <th>Profile Pic</th>
-                <th>First Name</th>
-                <th>Last Name</th>
-                <th>Date of Birth</th>
-                <th>Percentage</th>
-                <th width="280px">Action</th>
-
-            </tr>
-
-        </thead>
-
-        <tbody>
-
-        </tbody>
-
-    </table>
-
+    <div class="row mt-4 mb-4">
+        <div class="col-2">
+            <a class="btn btn-success" href="javascript:void(0)" id="createNewStudent"> Create New Student</a>
+        </div>
+        <div class="col-9 offset-1">
+            <div class="row">
+                <div class="form-check col-4">
+                    <input class="form-check-input" type="checkbox" value="" id="filter-by-date-of-birth">
+                    <label class="form-check-label" for="filter-by-date-of-birth">
+                      Filter of Date-of-Birth
+                    </label>
+                </div>
+                <div class="form-check col-4">
+                    <input class="form-check-input" type="checkbox" value="" id="filter-by-percentage">
+                    <label class="form-check-label" for="filter-by-percentage">
+                      Filter by Percentage
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-body table-responsive">
+            <table class="table table-bordered data-table display nowrap" id="data-table" style="width:100%;">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Profile Pic</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Date of Birth</th>
+                        <th>Percentage</th>
+                        <th width="10%">Action</th>
+                    </tr>
+                </thead>
+        
+                <tbody>
+        
+                </tbody>
+        
+            </table>
+        </div>
+    </div>
 </div>
 
    
@@ -105,7 +117,7 @@
                         <div class="col-sm-12">
 
                             <input type="text" class="form-control" id="first_name" name="first_name" placeholder="Enter First Name" value="" maxlength="50" required="">
-
+                            <span class="text-danger" id="first_name_error"></span>
                         </div>
 
                     </div>
@@ -117,7 +129,7 @@
                         <div class="col-sm-12">
 
                             <input type="text" class="form-control" id="last_name" name="last_name" placeholder="Enter Last Name" value="" maxlength="50" required="">
-
+                            <span class="text-danger" id="last_name_error"></span>
                         </div>
 
                     </div>
@@ -130,7 +142,7 @@
                         <div class="col-sm-12">
 
                             <input type="text" class="form-control" id="date-of-birth" name="date_of_birth" placeholder="Enter Date of Birth" value="" required="">
-
+                            <span class="text-danger" id="date_of_birth_error"></span>
                         </div>
 
                     </div>
@@ -142,7 +154,7 @@
                         <div class="col-sm-12">
 
                             <input type="text" class="form-control" id="percentage" name="percentage" placeholder="Percentage" value="" required="">
-
+                            <span class="text-danger" id="percentage_error"></span>
                         </div>
 
                     </div>
@@ -154,7 +166,7 @@
                         <div class="col-sm-12">
 
                             <input type="file" class="form-control" id="profile_picture" name="profile_picture" value="" required="">
-
+                            <span class="text-danger" id="profile_picture_error"></span>
                         </div>
 
                     </div>
@@ -162,7 +174,7 @@
 
                     <div class="col-sm-offset-2 col-sm-10">
 
-                     <button type="submit" class="btn btn-primary" id="saveBtn" value="create">Save changes
+                     <button type="button" class="btn btn-primary" id="saveBtn" value="create">Save changes
 
                      </button>
 
@@ -187,10 +199,7 @@
 <script type="text/javascript">
 
   $(function () {
-
-     
-
-      $.ajaxSetup({
+    $.ajaxSetup({
 
           headers: {
 
@@ -212,15 +221,15 @@
 
         columns: [
 
-            {data: 'DT_RowIndex', name: 'DT_RowIndex'},
+            {data: 'id', name: 'id'},
             
-            {data: 'profile_picture', name: 'profile_picture',"render": function (data, type, row, meta) {
-                            return '<img src="photos/'+data+'">';
-                        }
-                },
+            {data: 'profile_picture', 
+            name: 'profile_picture',
+            "render": function (data, type, row, meta) {
+                return '<img src="photos/'+data+'" class="w-100 h-100">';
+                }
+            },
             
-            
-
             {data: 'first_name', name: 'first_name'},
 
             {data: 'last_name', name: 'last_name'},
@@ -229,7 +238,10 @@
             
             {data: 'action', name: 'action', orderable: false, searchable: false},
 
-        ]
+        ],
+        "order": [[ 0, "desc" ]],
+        "scrollX": true,
+        "autoWidth": true
 
     });
 
@@ -253,27 +265,26 @@
 
     $('body').on('click', '.editStudent', function () {
 
-      var student_id = $(this).data('id');
+        var student_id = $(this).data('id');
 
-      $.get("{{ route('students.index') }}" +'/' + student_id +'/edit', function (data) {
+        $.get("{{ route('students.index') }}" +'/' + student_id +'/edit', function (data) {
 
-          $('#modelHeading').html("Edit Student");
+            $('#modelHeading').html("Edit Student");
 
-          $('#saveBtn').val("edit-student");
+            $('#saveBtn').val("edit-student");
 
-          $('#ajaxModel').modal('show');
+            $('#ajaxModel').modal('show');
 
-          $('#id').val(data.id);
+            $('#id').val(data.id);
 
-          $('#first_name').val(data.first_name);
+            $('#first_name').val(data.first_name);
 
-          $('#last_name').val(data.last_name);
-          $('#date-of-birth').val(data.date_of_birth);
-          $('#percentage').val(data.percentage);
-          $('#profile_picture').val(data.profile_picture);
-      })
+            $('#last_name').val(data.last_name);
+            $('#date-of-birth').val(data.date_of_birth);
+            $('#percentage').val(data.percentage);
+        });
 
-   });
+    });
 
     
 
@@ -287,73 +298,39 @@
 
         $.ajax({
 
-          data: postData,
+            data: postData,
 
-          url: "{{ route('students.store') }}",
+            url: "{{ route('students.store') }}",
 
-          type: "POST",
+            type: "POST",
 
-          dataType: 'json',
-          cache:false,
+            dataType: 'json',
+            cache:false,
 
-        contentType: false,
+            contentType: false,
 
-        processData: false,
+            processData: false,
 
 
-          success: function (data) {
+            success: function (response) { 
+                alert(response.success);
+                $('#studentForm').trigger("reset");
 
-     
-
-              $('#studentForm').trigger("reset");
-
-              $('#ajaxModel').modal('hide');
-
-              table.draw();
-
-         
-
-          },
-
-          error: function (data) {
-
-              console.log('Error:', data);
-
-              $('#saveBtn').html('Save Changes');
-
-          }
-
-      });
-
-    });
-
-    
-
-    $('body').on('click', '.deleteStudent', function () {
-
-     
-
-        var student_id = $(this).data("id");
-
-        confirm("Are You sure want to delete !");
-
-      
-
-        $.ajax({
-
-            type: "DELETE",
-
-            url: "{{ route('students.store') }}"+'/'+student_id,
-
-            success: function (data) {
+                $('#ajaxModel').modal('hide');
 
                 table.draw();
 
             },
 
-            error: function (data) {
+            error: function (response) { 
 
-                console.log('Error:', data);
+                var errors = $.parseJSON(response.responseText); 
+                $.each(errors.errors, function (key, val) { 
+                    $("#" + key + "_error").text(val[0]);
+                });
+
+            
+                $('#saveBtn').html('Save Changes');
 
             }
 
@@ -361,36 +338,60 @@
 
     });
 
-     
+    
+
+    $('body').on('click', '.deleteStudent', function () {
+
+        var student_id = $(this).data("id");
+
+        confirm("Are You sure want to delete !");
+      
+        $.ajax({
+
+            type: "DELETE",
+
+            url: "{{ route('students.store') }}"+'/'+student_id,
+
+            success: function (response) {
+                alert(response.success);
+                table.draw();
+
+            },
+
+            error: function (response) {  
+                alert("Error: "+$.parseJSON(response.responseText).message);
+            }
+
+        });
+
+    });
+
+      
+    $("#filter-by-date-of-birth").click(function(e){ 
+        var table = $('#data-table').DataTable();
+        if($(this).is(":checked")){
+            table.order([ 4,'desc']).draw();
+        }else if($(this).is(":not(:checked)")){
+            table.order([ 0,'desc'] ).draw();
+        }
+    });
+
+    $("#filter-by-percentage").click(function(e){ 
+        var table = $('#data-table').DataTable();
+        if($(this).is(":checked")){
+            table.order([ 5,'desc'] ).draw();
+        }else if($(this).is(":not(:checked)")){
+            table.order([ 0,'desc'] ).draw();
+        }
+    });
+
+    $('#date-of-birth').datepicker({  
+
+        format: 'yyyy-mm-dd'
+
+    });  
 
   });
-
-  
-  $("#filter-by-date-of-birth").click(function(e){ 
-    var table = $('#data-table').DataTable();
- 
- 
- table
-     .order( [ 4, 'desc' ] )
-     .draw();
-  });
-
-  $("#filter-percentage").click(function(e){ 
-    var table = $('#data-table').DataTable();
- 
- 
- table
-     .order( [ 5, 'desc' ] )
-     .draw();
-  });
-
-$('#date-of-birth').datepicker({  
-
-   format: 'yyyy-mm-dd'
-
- });  
-
- 
 
 </script>
 
